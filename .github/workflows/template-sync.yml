@@ -6,12 +6,11 @@ on:
 jobs:
   sync-upstream:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Sync files from template
         uses: AndreasAugustin/actions-template-sync@v2
@@ -20,6 +19,8 @@ jobs:
           is_allow_hooks: true
           is_dry_run: false
           pr_title: Update from homelab-template
+          source_gh_token: ${{ secrets.SYNC_PAT }}
+          target_gh_token: ${{ secrets.SYNC_PAT }}
           hooks: >
             precommit:
               commands:
