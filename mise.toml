@@ -23,7 +23,7 @@ gh run watch --compact $( gh run list --workflow template-sync.yml --event workf
 description = "View the changes from the template-sync PR"
 hide = true
 run = '''
-gh pr diff --color=always $(gh pr list --author '@me' --label sync_template --limit 1 --state open --json number --jq '.[].number')
+gh pr diff --color=always $(gh pr list --author $GITHUB_BOT_USER --label template_sync --limit 1 --state open --json number --jq '.[].number')
 '''
 
 [tasks."template:merge"]
@@ -31,7 +31,7 @@ description = "Merge the template sync changes PR"
 hide = true
 confirm = "Are you sure you want to merge the above template changes?"
 run = '''
-gh pr merge --auto -d $(gh pr list --author '@me' --label sync_template --limit 1 --state open --json number --jq '.[].number')
+gh pr merge --auto -d $(gh pr list --author $GITHUB_BOT_USER --label template_sync --limit 1 --state open --json number --jq '.[].number')
 '''
 
 [tasks."template:sync"]
