@@ -1,0 +1,27 @@
+---
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync-upstream:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Sync files from template
+        uses: AndreasAugustin/actions-template-sync@v2
+        with:
+          source_repo_path: petracvv-homelab/homelab-template
+          is_allow_hooks: true
+          is_dry_run: false
+          pr_title: Update from homelab-template
+          hooks: >
+            precommit:
+              commands:
+                - for dist in .github/workflows/*-dist; do name=$(echo "$dist" | sed 's/-dist//'); mv -v "$dist" "$name"; done
+

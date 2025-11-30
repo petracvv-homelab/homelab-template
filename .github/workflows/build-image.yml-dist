@@ -1,0 +1,19 @@
+---
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/build-image.yml
+      - Containerfile
+      - 'ansible/build/**'
+  workflow_dispatch:
+
+jobs:
+  build-image:
+    uses: petracvv-homelab/homelab-template/.github/workflows/shared-build-image.yml@main
+    with:
+      image_tag: ${{ vars.IMAGE_TAG }}
+    secrets: inherit
+    

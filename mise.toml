@@ -1,0 +1,36 @@
+[env]
+_.python.venv = { path = "{{env.HOME}}/.cache/venv/ansible", create = true}
+GH_PAGER="cat"
+
+[tools]
+python = "3.13"
+
+[tasks.install]
+description = "Install dependencies"
+alias = "i"
+run = "pip install -r requirements.txt"
+
+[tasks."template:trigger"]
+description = "Trigger template sync job"
+hide = true
+run = '''
+gh workflow run template-sync.yml
+sleep 5
+gh run watch $( gh run list --workflow template-sync.yml --event workflow_dispatch --branch main --user $GITHUB_USER --limit 1 --json databaseId --jq '.[].databaseId' )
+'''
+
+[tasks."template:view"]
+description = "View the changes from the template-sync PR"
+hide = true
+run = '''
+gh pr diff --color=always $(gh pr list --author '@me' --label sync_template --limit 1 --state open --json number --jq '.[].number')
+'''
+
+[tasks."template:merge"]
+description = "Merge the template sync changes PR"
+hide = true
+confirm = "Are you sure you want to merge the above template changes?"
+run = '''
+gh pr merge --auto -d $(gh pr list --author '@me' --label sync_template --limit 1 --state open --json number --jq '.[].number')
+'''
+
