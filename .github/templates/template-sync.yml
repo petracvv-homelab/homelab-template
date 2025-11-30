@@ -23,5 +23,7 @@ jobs:
           hooks: >
             precommit:
               commands:
-                - for dist in .github/workflows/*-dist; do name=$(echo "$dist" | sed 's/-dist//'); mv -v "$dist" "$name"; done
+                - find .github/workflows -name 'shared*' -exec rm -v {} \;
+                - find .github/templates -name '*.yml' -exec mv -v {} .github/workflows/ \;
+
 
