@@ -25,7 +25,7 @@ if [[ "$(sha256sum ${tmp_dir}/mise.toml | awk '{print $1}')" != "$(sha256sum mis
   exit 0
 fi
 
-rsync -av --include-from="${tmp_dir}/.templatesyncinclude "${tmp_dir}/" .
+rsync -av --include-from="${tmp_dir}/.templatesyncinclude" "${tmp_dir}/" .
 mv -v .github/templates/*.yml .github/workflows
 rmdir -v .github/templates
 rm -rf "${tmp_dir}"
