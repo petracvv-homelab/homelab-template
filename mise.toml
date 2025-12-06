@@ -17,7 +17,7 @@ run = '''
 tmp_dir=$(mktemp -d)
 template_repo=$(gh repo view --json templateRepository --jq '.templateRepository | "git@github.com:\(.owner.login)/\(.name).git"')
 git clone ${template_repo} ${tmp_dir}
-if [[ "$(sha256sum ${tmp_dir}/mise.toml)" != $(sha256sum mise.toml) ]]; then
+if [[ "$(sha256sum ${tmp_dir}/mise.toml | awk '{print $1}')" != "$(sha256sum mise.toml | awk '{print $1})" ]]; then
   echo "mise.toml has updates. Copying updates and relaunching sync..."
   cp -v "${tmp_dir}/mise.toml" .
   rm -rf "${tmp_dir}"
