@@ -12,13 +12,14 @@ run = "pip install -r requirements.txt"
 [tasks."template:sync"]
 description = "Sync changes from upstream template"
 run = '''
-#!/user/bin/env bash
+#!/usr/bin/env bash
 
 tmp_dir=$(mktemp -d)
 template_repo=$(gh repo view --json templateRepository --jq '.templateRepository | "git@github.com:\(.owner.login)/\(.name).git"')
 git clone ${template_repo} ${tmp_dir}
 if [[ "$(sha256sum ${tmp_dir}/mise.toml)" != $(sha256sum mise.toml) ]]; then
-  echo "mise.toml has updated. Relaunching sync"
+  echo "mise.toml has updates. Copying updates and relaunching sync..."
+  cp -v "${tmp_dir}/mise.toml" .
   rm -rf "${tmp_dir}"
   mise template:sync
   exit 0
