@@ -1,9 +1,0 @@
-# Includes
-+ .github/
-+ .gitignore
-+ mise.toml
-+ requirements.txt
-
-# Excludes
-- .github/workflows/shared*
-- .templatesyncinclude
