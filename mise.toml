@@ -9,29 +9,23 @@ description = "Install dependencies"
 alias = "i"
 run = "pip install -r requirements.txt"
 
-[tasks."template:trigger"]
-description = "Trigger template sync job"
-hide = true
-run = '''
-gh workflow run template-sync.yml
-sleep 5
-gh run watch $( gh run list --workflow template-sync.yml --event workflow_dispatch --branch main --user $GITHUB_USER --limit 1 --json databaseId --jq '.[].databaseId' )
-'''
-
-[tasks."template:view"]
-description = "View the changes from the template-sync PR"
-hide = true
-run = '''
-gh pr diff $(gh pr list --author $GITHUB_BOT_USER --label template_sync --limit 1 --state open --json number --jq '.[].number')
-'''
-
-[tasks."template:merge"]
-description = "Merge the template sync changes PR"
-hide = true
-run = '''
-gh pr merge -d --squash $(gh pr list --author $GITHUB_BOT_USER --label template_sync --limit 1 --state open --json number --jq '.[].number')
-'''
-
 [tasks."template:sync"]
 description = "Sync changes from upstream template"
-run = ['mise run template:trigger', 'mise run template:view', 'mise run template:merge', 'git pull']
+run = '''
+#!/user/bin/env bash
+
+tmp_dir=$(mktemp -d)
+template_repo=$(gh repo view --json templateRepository --jq '.templateRepository | "git@github.com:\(.owner.login)/\(.name).git"')
+git clone ${template_repo} ${tmp_dir}
+if [[ "$(sha256sum ${tmp_dir}/mise.toml)" != $(sha256sum mise.toml) ]]; then
+  echo "mise.toml has updated. Relaunching sync"
+  rm -rf "${tmp_dir}"
+  mise template:sync
+  exit 0
+fi
+
+rsync -av --include-from="${tmp_dir}/.templatesyncinclude "${tmp_dir}/" .
+mv -v .github/templates/*.yml .github/workflows
+rmdir -v .github/templates
+rm -rf "${tmp_dir}"
+'''
