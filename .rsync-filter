@@ -1,3 +1,5 @@
 # Excludes
 -C
 - .github/workflows/shared*
+- README.md
+- Containerfile
